@@ -1,51 +1,98 @@
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Main {
     public static void main(String[] args) {
         //TODO: change to non-constant number
-        String httpsURL = "https://api.collegefootballdata.com/teams/fbs?year=" + 2022;
+        JSONArray bigTenTeams = getBigTenTeams(2022);
+        for (int i = 0; i < bigTenTeams.size(); i++) {
+            JSONObject team = (JSONObject) bigTenTeams.get(i);
+            System.out.println(team.get("school"));
+        }
+    }
 
+    /**
+     * Uses CFDB API to get all B1G teams in JSON
+     * @param year Roster year
+     * @return JSONArray of B1G teams
+     */
+    public static JSONArray getBigTenTeams(int year) {
+        String httpsURL = "https://api.collegefootballdata.com/teams/fbs?year=" + year;
+        //connect to CFDB
+        HttpsURLConnection connection = getApiConnection(httpsURL);
+        //Create streams to read from CFDB
+        BufferedReader br = getStreamReader(connection);
+        //Get all B1G teams from CFDB
+        return extractBigTenTeams(br);
+    }
+
+    /**
+     * Connects to CFDB
+     * @param httpsURL The URL to connect to
+     * @return HttpsURLConnection that allows connection to CFDB
+     */
+    private static HttpsURLConnection getApiConnection(String httpsURL) {
         try {
-            URL myURL = new URL(httpsURL);
-            //Open connection to the URL
-            System.out.println("Opening connection...");
-            HttpsURLConnection conn = (HttpsURLConnection) myURL.openConnection();
-            conn.setRequestProperty("Authorization", API_KEYS.CFDB_API);
+            URL url = new URL(httpsURL);
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setRequestProperty("Authorization", API_KEYS.CFDB_API);
+            return connection;
+        } catch (MalformedURLException e) {
+            System.err.println("URL is malformed");
+        } catch (IOException e) {
+            System.err.println("Error creating connection to CFDB");
+        }
+        return null;
+    }
 
-            System.out.println("Opening streams...");
-            InputStream is = conn.getInputStream();
+    /**
+     * Opens input stream to CFDB
+     * @param connection Connection to read from
+     * @return BufferedReader that can read from CFDB
+     */
+    private static BufferedReader getStreamReader(HttpsURLConnection connection) {
+        try {
+            InputStream is = connection.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
+            return new BufferedReader(isr);
+        } catch (IOException ex) {
+            System.err.println("Error creating streams to read from CFDB");
+        }
+        return null;
+    }
 
-            //Holds all teams in JSON Array
-            String input = br.readLine();
-
-            JSONParser parser = new JSONParser();
-            //JSON array of all teams from CFDB
-            JSONArray array = (JSONArray) parser.parse(input);
-
-            //Iterate through every JSON team and store all B1G teams
-            JSONArray bigTenTeams = new JSONArray();
-            for (Object team : array) {
-                JSONObject teamInfo = (JSONObject) team;
-                if (teamInfo.get("conference").toString().equals("Big Ten")) {
-                    System.out.printf("Adding %s%n", teamInfo.get("school").toString());
-                    bigTenTeams.add(team);
+    /**
+     * Gets all NCAA teams filters all out except B1G
+     * @param br Database reader
+     * @return JSONArray of B1G teams
+     */
+    private static JSONArray extractBigTenTeams(BufferedReader br) {
+        JSONArray bigTenTeams = new JSONArray();
+        try {
+            //Gets all NCAA teams
+            JSONArray ncaaTeams = (JSONArray) new JSONParser().parse(br.readLine());
+            //Filter out all but B1G teams and put into own JSONArray
+            for (Object team : ncaaTeams) {
+                JSONObject jsonTeam = (JSONObject) team;
+                if (jsonTeam.get("conference").toString().equals("Big Ten")) {
+                    bigTenTeams.add(jsonTeam);
                 }
             }
-
-
-
-        } catch (Exception e) { //TODO: Specify exception
-
+        } catch (IOException ex) {
+            System.err.println("Error reading from CFDB while fetching all NCAA teams");
+        } catch (ParseException e) {
+            System.err.println("Error while parsing all NCAA teams JSON");
         }
+        return bigTenTeams;
     }
 }
