@@ -1,3 +1,7 @@
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -23,6 +27,21 @@ public class Main {
 
             //Holds all teams in JSON Array
             String input = br.readLine();
+
+            JSONParser parser = new JSONParser();
+            //JSON array of all teams from CFDB
+            JSONArray array = (JSONArray) parser.parse(input);
+
+            //Iterate through every JSON team and store all B1G teams
+            JSONArray bigTenTeams = new JSONArray();
+            for (Object team : array) {
+                JSONObject teamInfo = (JSONObject) team;
+                if (teamInfo.get("conference").toString().equals("Big Ten")) {
+                    System.out.printf("Adding %s%n", teamInfo.get("school").toString());
+                    bigTenTeams.add(team);
+                }
+            }
+
 
 
         } catch (Exception e) { //TODO: Specify exception
