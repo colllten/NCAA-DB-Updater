@@ -14,11 +14,11 @@ import java.net.URL;
 public class Main {
     public static void main(String[] args) {
         //TODO: change to non-constant number
+        //Get JSONArray containing all B1G teams
         JSONArray bigTenTeams = getBigTenTeams(2022);
-        for (int i = 0; i < bigTenTeams.size(); i++) {
-            JSONObject team = (JSONObject) bigTenTeams.get(i);
-            System.out.println(team.get("school"));
-        }
+        JSONObject team = (JSONObject) bigTenTeams.get(0);
+        //Modify each team's JSON to only contain the necessary data
+        bigTenTeams = modifyTeamsData(bigTenTeams);
     }
 
     /**
@@ -94,5 +94,29 @@ public class Main {
             System.err.println("Error while parsing all NCAA teams JSON");
         }
         return bigTenTeams;
+    }
+
+    /**
+     * CFDB has too much data about each team, so the function filters much of it out
+     * @param teams JSON array of teams
+     * @return Modified JSON array of teams with only necessary data
+     */
+    public static JSONArray modifyTeamsData(JSONArray teams) {
+        JSONArray modifiedTeams = new JSONArray();
+        for (int i = 0; i < teams.size(); i++) {
+            JSONObject modifiedTeam = new JSONObject();
+            //Retrieve only necessary data
+            modifiedTeam.put("conference", ((JSONObject) teams.get(i)).get("conference").toString());
+            modifiedTeam.put("color", ((JSONObject) teams.get(i)).get("color").toString());
+            modifiedTeam.put("alt_color", ((JSONObject) teams.get(i)).get("alt_color").toString());
+            modifiedTeam.put("abbreviation", ((JSONObject) teams.get(i)).get("abbreviation").toString());
+            modifiedTeam.put("logos", ((JSONObject) teams.get(i)).get("logos"));
+            modifiedTeam.put("color", ((JSONObject) teams.get(i)).get("color").toString());
+            modifiedTeam.put("division", ((JSONObject) teams.get(i)).get("division").toString());
+            modifiedTeam.put("school", ((JSONObject) teams.get(i)).get("school").toString());
+            modifiedTeam.put("id", ((JSONObject) teams.get(i)).get("id").toString());
+            modifiedTeams.add(modifiedTeam);
+        }
+        return modifiedTeams;
     }
 }
