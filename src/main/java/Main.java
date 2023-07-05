@@ -1,3 +1,4 @@
+import com.google.cloud.firestore.DocumentReference;
 import com.google.firebase.cloud.FirestoreClient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -18,6 +19,10 @@ import com.google.firebase.FirebaseOptions;
 public class Main {
     static Firestore db;
     public static void main(String[] args) {
+        //TODO: Implement logging
+        //TODO: Improve exception handling
+
+
         //Initialize instance of Cloud Firestore
         // Use a service account
         try {
@@ -32,17 +37,28 @@ public class Main {
             db = FirestoreClient.getFirestore();
         } catch (FileNotFoundException e) {
             System.err.println("Error reading service account file while connecting to Firestore");
+            e.printStackTrace();
             return;
         } catch (IOException e) {
             System.err.println("IOException while connecting to Firestore");
+            e.printStackTrace();
         }
 
         //TODO: change to non-constant number
         //Get JSONArray containing all B1G teams
         JSONArray bigTenTeams = getBigTenTeams(2022);
-        JSONObject team = (JSONObject) bigTenTeams.get(0);
         //Modify each team's JSON to only contain the necessary data
         bigTenTeams = modifyTeamsData(bigTenTeams);
+
+        System.out.println("Writing all teams to Firestore...");
+        //Write each team to the database
+        for (int i = 0; i < bigTenTeams.size(); i++) {
+            DocumentReference docRef = db.collection("B1G-Teams")
+                    .document(((JSONObject) bigTenTeams.get(i)).get("id").toString());
+            //asynchronously write data
+            docRef.set((JSONObject) bigTenTeams.get(i));
+        }
+        System.out.println("Firestore writing complete");
     }
 
     /**
