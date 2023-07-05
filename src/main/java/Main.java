@@ -1,18 +1,42 @@
+import com.google.firebase.cloud.FirestoreClient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.Firestore;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+
 public class Main {
+    static Firestore db;
     public static void main(String[] args) {
+        //Initialize instance of Cloud Firestore
+        // Use a service account
+        try {
+            InputStream serviceAccount = new FileInputStream("/Users/coltenglover/Desktop/NCAA-Fantasy-Football" +
+                    "/Database/ncaa-fantasy-football-391902-32591822272e.json");
+            GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(credentials)
+                    .build();
+            FirebaseApp.initializeApp(options);
+
+            db = FirestoreClient.getFirestore();
+        } catch (FileNotFoundException e) {
+            System.err.println("Error reading service account file while connecting to Firestore");
+            return;
+        } catch (IOException e) {
+            System.err.println("IOException while connecting to Firestore");
+        }
+
         //TODO: change to non-constant number
         //Get JSONArray containing all B1G teams
         JSONArray bigTenTeams = getBigTenTeams(2022);
