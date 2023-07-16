@@ -59,8 +59,8 @@ public class Main {
         }
 
         //Set the year to update
-        int yearIndex = 0;
-        while (yearIndex >= 0 && yearIndex <= 3) {
+        int yearIndex = -1;
+        while (yearIndex <= 0 || yearIndex >= 3) {
             yearIndex = JOptionPane.showOptionDialog(null, "Choose what to update", "Update Options",
                     JOptionPane.DEFAULT_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, years, 0);
