@@ -52,14 +52,20 @@ public class Main {
             return;
         }
 
+        //Options of years to update from
         Integer[] years = new Integer[4];
         for (int year = Year.now().getValue() - 2; year < Year.now().getValue() + 2; year++) {
             years[year - Year.now().getValue() + 2] = year;
         }
-        //TODO: change to non-constant number
-        int yearIndex = JOptionPane.showOptionDialog(null, "Choose what to update", "Update Options",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null, years, 0);
+
+        //Set the year to update
+        int yearIndex = 0;
+        while (yearIndex >= 0 && yearIndex <= 3) {
+            yearIndex = JOptionPane.showOptionDialog(null, "Choose what to update", "Update Options",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, years, 0);
+        }
+
         //Get JSONArray containing all B1G teams
         JSONArray bigTenTeams = getBigTenTeams(years[yearIndex]);
         //Modify each team's JSON to only contain the necessary data
