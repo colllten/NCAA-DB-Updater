@@ -88,6 +88,7 @@ public class Main {
      * @return JSONArray of B1G teams
      */
     public static JSONArray getBigTenTeams(int year) {
+        //URL to pull from
         String httpsURL = "https://api.collegefootballdata.com/teams/fbs?year=" + year;
         //connect to CFDB
         HttpsURLConnection connection = getApiConnection(httpsURL);
@@ -164,18 +165,18 @@ public class Main {
      */
     public static JSONArray modifyTeamsData(JSONArray teams) {
         JSONArray modifiedTeams = new JSONArray();
-        for (int i = 0; i < teams.size(); i++) {
+        for (Object team : teams) {
             JSONObject modifiedTeam = new JSONObject();
             //Retrieve only necessary data
-            modifiedTeam.put("conference", ((JSONObject) teams.get(i)).get("conference").toString());
-            modifiedTeam.put("color", ((JSONObject) teams.get(i)).get("color").toString());
-            modifiedTeam.put("alt_color", ((JSONObject) teams.get(i)).get("alt_color").toString());
-            modifiedTeam.put("abbreviation", ((JSONObject) teams.get(i)).get("abbreviation").toString());
-            modifiedTeam.put("logos", ((JSONObject) teams.get(i)).get("logos"));
-            modifiedTeam.put("color", ((JSONObject) teams.get(i)).get("color").toString());
-            modifiedTeam.put("division", ((JSONObject) teams.get(i)).get("division").toString());
-            modifiedTeam.put("school", ((JSONObject) teams.get(i)).get("school").toString());
-            modifiedTeam.put("id", ((JSONObject) teams.get(i)).get("id").toString());
+            modifiedTeam.put("conference", ((JSONObject) team).get("conference").toString());
+            modifiedTeam.put("color", ((JSONObject) team).get("color").toString());
+            modifiedTeam.put("alt_color", ((JSONObject) team).get("alt_color").toString());
+            modifiedTeam.put("abbreviation", ((JSONObject) team).get("abbreviation").toString());
+            modifiedTeam.put("logos", ((JSONObject) team).get("logos"));
+            modifiedTeam.put("color", ((JSONObject) team).get("color").toString());
+            modifiedTeam.put("division", ((JSONObject) team).get("division").toString());
+            modifiedTeam.put("school", ((JSONObject) team).get("school").toString());
+            modifiedTeam.put("id", ((JSONObject) team).get("id").toString());
             modifiedTeams.add(modifiedTeam);
         }
         return modifiedTeams;
