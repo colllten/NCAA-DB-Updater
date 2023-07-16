@@ -110,9 +110,9 @@ public class Main {
             connection.setRequestProperty("Authorization", API_KEYS.CFDB_API);
             return connection;
         } catch (MalformedURLException e) {
-            System.err.println("URL is malformed");
+            JOptionPane.showMessageDialog(null, "API URL is malformed", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            System.err.println("Error creating connection to CFDB");
+            JOptionPane.showMessageDialog(null, "Error creating connection to CFDB", "Error", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
