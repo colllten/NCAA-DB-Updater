@@ -68,6 +68,10 @@ public class Main {
 
         //Get JSONArray containing all B1G teams
         JSONArray bigTenTeams = getBigTenTeams(years[yearIndex]);
+        if (bigTenTeams == null) {
+            JOptionPane.showMessageDialog(null, "Error retrieving teams from CFDB", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         //Modify each team's JSON to only contain the necessary data
         bigTenTeams = modifyTeamsData(bigTenTeams);
 
@@ -92,6 +96,10 @@ public class Main {
         String httpsURL = "https://api.collegefootballdata.com/teams/fbs?year=" + year;
         //connect to CFDB
         HttpsURLConnection connection = getApiConnection(httpsURL);
+        if (connection == null) {
+            JOptionPane.showMessageDialog(null, "Error creating connection to CFDB", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
         //Create streams to read from CFDB
         BufferedReader br = getStreamReader(connection);
         //Get all B1G teams from CFDB
