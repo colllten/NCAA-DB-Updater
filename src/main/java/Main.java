@@ -6,9 +6,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.swing.*;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
+import java.time.Year;
+import java.time.temporal.TemporalField;
+import java.util.Date;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
@@ -21,11 +26,12 @@ public class Main {
     public static void main(String[] args) {
         //TODO: Implement logging
         //TODO: Improve exception handling
-
+        //TODO: Add GUIs
 
         //Initialize instance of Cloud Firestore
         // Use a service account
         try {
+            //Open stream to Firebase
             InputStream serviceAccount = new FileInputStream("/Users/coltenglover/Desktop/NCAA-Fantasy-Football" +
                     "/Database/ncaa-fantasy-football-391902-32591822272e.json");
             GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
@@ -33,20 +39,29 @@ public class Main {
                     .setCredentials(credentials)
                     .build();
             FirebaseApp.initializeApp(options);
-
             db = FirestoreClient.getFirestore();
         } catch (FileNotFoundException e) {
-            System.err.println("Error reading service account file while connecting to Firestore");
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error reading service account file while connecting to Firestore",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         } catch (IOException e) {
-            System.err.println("IOException while connecting to Firestore");
+            JOptionPane.showMessageDialog(null, "Error creating stream connecting to Firebase",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
+            return;
         }
 
+        Integer[] years = new Integer[4];
+        for (int year = Year.now().getValue() - 2; year < Year.now().getValue() + 2; year++) {
+            years[year - Year.now().getValue() + 2] = year;
+        }
         //TODO: change to non-constant number
+        int yearIndex = JOptionPane.showOptionDialog(null, "Choose what to update", "Update Options",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, years, 0);
         //Get JSONArray containing all B1G teams
-        JSONArray bigTenTeams = getBigTenTeams(2022);
+        JSONArray bigTenTeams = getBigTenTeams(years[yearIndex]);
         //Modify each team's JSON to only contain the necessary data
         bigTenTeams = modifyTeamsData(bigTenTeams);
 
