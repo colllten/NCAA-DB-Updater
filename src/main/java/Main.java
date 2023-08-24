@@ -10,10 +10,7 @@ import javax.swing.*;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.Instant;
 import java.time.Year;
-import java.time.temporal.TemporalField;
-import java.util.Date;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
