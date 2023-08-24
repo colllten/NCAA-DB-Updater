@@ -80,7 +80,7 @@ public class Main {
             //asynchronously write data
             docRef.set((JSONObject) bigTenTeams.get(i));
         }
-        System.out.println("Firestore writing complete");
+        JOptionPane.showMessageDialog(null, "Firebase writing complete");
     }
 
     /**
