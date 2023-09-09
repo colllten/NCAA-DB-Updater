@@ -12,6 +12,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Year;
 
+import java.sql.*;
+
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
 
@@ -48,6 +50,30 @@ public class Main {
             e.printStackTrace();
             return;
         }
+        System.out.println("Making connection to PSQL server...");
+        try {
+            Connection db = DriverManager.getConnection("jdbc:postgresql://localhost:5555/B1G", "postgres",
+                    "MochiMan10!");
+            String insertion = "INSERT into team (id, school, alt_name1, alt_name2, division, color, " +
+                    "alt_color, logos) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+            PreparedStatement ps = db.prepareStatement(insertion);
+            ps.setInt(1, 1);
+            ps.setString(2, "Purdue");
+            ps.setString(3, "PUR");
+            ps.setString(4, "PURD");
+            ps.setString(5, "North");
+            ps.setString(6, "Black");
+            ps.setString(7, "Gold");
+            Object[] arr = {"Purdue.png"};
+            Array array = db.createArrayOf("TEXT", arr);
+            ps.setArray(8, array);
+            System.out.println(ps.executeUpdate());
+            Thread.sleep(10000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         //Options of years to update from
         Integer[] years = new Integer[4];
