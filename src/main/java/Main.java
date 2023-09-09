@@ -63,8 +63,25 @@ public class Main {
                     JOptionPane.QUESTION_MESSAGE, null, years, 0);
         }
 
+        //TODO: Split updating teams or players
+        String[] updateChoices = {"Teams", "Players"};
+        int choice = JOptionPane.showOptionDialog(null, "Choose entity to update", "Update Entity",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, updateChoices, 0);
+        System.out.println(choice);
+        if (choice == 0) {
+            getBigTenTeams(years[yearIndex]);
+        } else if (choice == 1) { //Players
+
+        } else {
+
+        }
+
+        JOptionPane.showMessageDialog(null, "Firebase writing complete");
+    }
+
+    static void updateBigTenTeams(int year) {
         //Get JSONArray containing all B1G teams
-        JSONArray bigTenTeams = getBigTenTeams(years[yearIndex]);
+        JSONArray bigTenTeams = getBigTenTeams(year);
         if (bigTenTeams == null) {
             JOptionPane.showMessageDialog(null, "Error retrieving teams from CFDB", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -80,7 +97,6 @@ public class Main {
             //asynchronously write data
             docRef.set((JSONObject) bigTenTeams.get(i));
         }
-        JOptionPane.showMessageDialog(null, "Firebase writing complete");
     }
 
     /**
