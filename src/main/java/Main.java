@@ -60,8 +60,7 @@ public class Main {
         int yearIndex = -1;
         while (yearIndex <= 0 || yearIndex >= 3) {
             yearIndex = JOptionPane.showOptionDialog(null, "Choose what to update", "Update Options",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, years, 0);
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, years, 0);
         }
 
         //TODO: Split updating teams or players
@@ -81,9 +80,8 @@ public class Main {
                 List<QueryDocumentSnapshot> documents = future.get().getDocuments();
                 for (DocumentSnapshot document : documents) {
                     //Each document is a team... request the roster from CFDB for each team
-                    //TODO: Change from 2023
                     BufferedReader br = getStreamReader(getApiConnection("https://api.collegefootballdata.com" +
-                            "/roster?team=" + document.get("school") + "&year=" + 2023));
+                            "/roster?team=" + document.get("school") + "&year=" + years[yearIndex]));
                     JSONArray roster = (JSONArray) new JSONParser().parse(br.readLine());
                     for (int i = 0; i < roster.size(); i++) {
                         JSONObject player = (JSONObject) roster.get(i);
