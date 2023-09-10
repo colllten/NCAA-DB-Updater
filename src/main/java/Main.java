@@ -1,4 +1,5 @@
-import com.google.cloud.firestore.DocumentReference;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -11,9 +12,9 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Year;
+import java.util.List;
 
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.Firestore;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -71,7 +72,48 @@ public class Main {
         if (choice == 0) {
             getBigTenTeams(years[yearIndex]);
         } else if (choice == 1) { //Players
+            //Get all offensive and special teams players in each B1G team
+            //Iterate over each B1G in Firestore DB
+            // asynchronously retrieve multiple documents
+            ApiFuture<QuerySnapshot> future = db.collection("B1G-Teams").get();
+            // future.get() blocks on response
+            try {
+                List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+                for (DocumentSnapshot document : documents) {
+                    //Each document is a team... request the roster from CFDB for each team
+                    //TODO: Change from 2023
+                    BufferedReader br = getStreamReader(getApiConnection("https://api.collegefootballdata.com" +
+                            "/roster?team=" + document.get("school") + "&year=" + 2023));
+                    JSONArray roster = (JSONArray) new JSONParser().parse(br.readLine());
+                    for (int i = 0; i < roster.size(); i++) {
+                        JSONObject player = (JSONObject) roster.get(i);
+                        if (player.get("position").equals("DB") || player.get("position").equals("DL") || player.get(
+                                "position").equals("LB") || player.get("position").equals("PK") || player.get(
+                                        "position").equals("LS") || player.get("position").equals("P")) {
+                            continue;
+                        }
+                        //Remove unnecessary fields
+                        player.remove("home_city");
+                        player.remove("home_state");
+                        player.remove("home_country");
+                        player.remove("home_latitude");
+                        player.remove("home_longitude");
+                        player.remove("home_county_fips");
+                        player.remove("recruit_ids");
 
+                        System.out.printf("Writing %s %s to DB\n", player.get("first_name").toString(), player.get(
+                                "last_name").toString());
+                        //write to Firestore DB
+                        DocumentReference docRef = db.collection("B1G-Offensive-Players")
+                                .document(player.get("id").toString());
+                        //asynchronously write data
+                        docRef.set(player);
+                    }
+                }
+                Thread.sleep(10000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
 
         }
